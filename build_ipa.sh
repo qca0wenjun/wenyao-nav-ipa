@@ -4,16 +4,17 @@
 set -e
 cd "$(dirname "$0")"
 
-# NOTE: -target builds must NOT pass -destination (xcodebuild rejects the mix).
+# NOTE: -target 模式不能同时给 -destination；-derivedDataPath 也会被新版 Xcode 拒绝。
+# 用 SYMROOT 指定产物目录（产物在 build/Release-iphoneos/WenYaoNav.app）。
 xcodebuild -project WenYaoNav.xcodeproj \
   -target WenYaoNav \
   -configuration Release \
   -sdk iphoneos \
+  SYMROOT="$PWD/build" \
   CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
-  -derivedDataPath build \
   clean build
 
-APP="$(find build/Build/Products -maxdepth 4 -type d -name 'WenYaoNav.app' -print -quit)"
+APP="$(find "$PWD/build" -maxdepth 4 -type d -name 'WenYaoNav.app' -print -quit)"
 if [ -z "$APP" ]; then echo "找不到 WenYaoNav.app"; exit 1; fi
 echo "构建产物：$APP"
 
