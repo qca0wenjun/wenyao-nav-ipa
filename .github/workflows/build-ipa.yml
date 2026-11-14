@@ -1,0 +1,56 @@
+# 没有 Mac 也能出 IPA：把本目录整个推到 GitHub 仓库，Actions 会自动用云端 macOS 编译。
+# 下载产物 WenYaoNav-unsigned-ipa → 里面的 WenYaoNav-unsigned.ipa → 巨魔商店安装。
+name: Build unsigned IPA
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show Xcode
+        run: xcodebuild -version
+
+      - name: Build unsigned app
+        run: |
+          set -euo pipefail
+          # NOTE: -target builds must NOT pass -destination (xcodebuild rejects the mix).
+          xcodebuild -project WenYaoNav.xcodeproj \
+            -target WenYaoNav \
+            -configuration Release \
+            -sdk iphoneos \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            -derivedDataPath build \
+            clean build
+          APP="$(find build/Build/Products -maxdepth 4 -type d -name 'WenYaoNav.app' -print -quit)"
+          test -n "$APP" || { echo "::error::WenYaoNav.app not found"; find build/Build/Products -maxdepth 4 | head -60; exit 1; }
+          echo "Built app: $APP"
+
+      - name: Pack IPA
+        run: |
+          set -euo pipefail
+          APP="$(find build/Build/Products -maxdepth 4 -type d -name 'WenYaoNav.app' -print -quit)"
+          test -n "$APP" || { echo "::error::WenYaoNav.app not found"; exit 1; }
+          rm -rf Payload WenYaoNav-unsigned.ipa
+          mkdir Payload
+          cp -R "$APP" Payload/
+          # TrollStore/installd needs a code signature directory; ad-hoc sign is enough.
+          codesign -s - --force --deep "Payload/WenYaoNav.app" || echo "::warning::ad-hoc codesign failed, continuing"
+          zip -qry WenYaoNav-unsigned.ipa Payload
+          ls -lh WenYaoNav-unsigned.ipa
+          unzip -l WenYaoNav-unsigned.ipa | head -25
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: WenYaoNav-unsigned-ipa
+          path: WenYaoNav-unsigned.ipa
+          if-no-files-found: error
