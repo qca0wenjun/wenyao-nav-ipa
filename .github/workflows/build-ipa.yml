@@ -21,25 +21,26 @@ jobs:
       - name: Build unsigned app
         run: |
           set -euo pipefail
-          # NOTE: -target builds must NOT pass -destination (xcodebuild rejects the mix).
+          # NOTE: -target 模式不能同时给 -destination；-derivedDataPath 也会被新版 Xcode 拒绝。
+          # 用 SYMROOT 指定产物目录（产物在 build/Release-iphoneos/WenYaoNav.app）。
           xcodebuild -project WenYaoNav.xcodeproj \
             -target WenYaoNav \
             -configuration Release \
             -sdk iphoneos \
+            SYMROOT="$PWD/build" \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
-            -derivedDataPath build \
             clean build
-          APP="$(find build/Build/Products -maxdepth 4 -type d -name 'WenYaoNav.app' -print -quit)"
-          test -n "$APP" || { echo "::error::WenYaoNav.app not found"; find build/Build/Products -maxdepth 4 | head -60; exit 1; }
+          APP="$(find "$PWD/build" -maxdepth 4 -type d -name 'WenYaoNav.app' -print -quit)"
+          test -n "$APP" || { echo "::error::WenYaoNav.app not found"; find "$PWD/build" -maxdepth 4 | head -60; exit 1; }
           echo "Built app: $APP"
 
       - name: Pack IPA
         run: |
           set -euo pipefail
-          APP="$(find build/Build/Products -maxdepth 4 -type d -name 'WenYaoNav.app' -print -quit)"
-          test -n "$APP" || { echo "::error::WenYaoNav.app not found"; exit 1; }
+          APP="$(find "$PWD/build" -maxdepth 4 -type d -name 'WenYaoNav.app' -print -quit)"
+          test -n "$APP" || { echo "::error::WenYaoNav.app not found"; find "$PWD/build" -maxdepth 4 | head -60; exit 1; }
           rm -rf Payload WenYaoNav-unsigned.ipa
           mkdir Payload
           cp -R "$APP" Payload/
