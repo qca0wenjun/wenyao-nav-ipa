@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>zh_CN</string>
+	<key>CFBundleDisplayName</key>
+	<string>问爻导航</string>
+	<key>CFBundleExecutable</key>
+	<string>WenYaoNav</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.wenyao.nav</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>WenYaoNav</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>MinimumOSVersion</key>
+	<string>15.0</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.0</string>
+	<key>CFBundleVersion</key>
+	<string>1</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>UILaunchScreenGeneration</key>
+	<true/>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>arm64</string>
+		<string>bluetooth-le</string>
+	</array>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+		<string>bluetooth-central</string>
+		<string>fetch</string>
+	</array>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>问爻导航需要持续获取位置，才能把转向信息发送到设备</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>问爻导航需要获取位置以规划路线</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>问爻导航需要通过蓝牙连接问爻设备</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>问爻导航需要通过蓝牙连接问爻设备</string>
+</dict>
+</plist>
